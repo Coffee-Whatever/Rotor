@@ -8,17 +8,24 @@ from kivy.uix.image import Image
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics.context_instructions import PushMatrix, PopMatrix, Rotate
+import socket
+import sys
 
 kivy.require('2.1.0')
 
 x, y = 800, 800
+# x, y = Window.size
 Window.size = (x, y)
 Window.top = 35
 Window.left = 5
 class Main(FloatLayout):
 	def __init__(self, **kwargs):
 		super(Main, self).__init__(**kwargs)
+		self.c = None
+		self.s = None
+		self.s2 = None
 		self.rot = None
+		self.angle = 0
 		global x
 		global y
 		self.L = Button(text="W lewo", size_hint=(0.2, 0.1))
@@ -36,9 +43,36 @@ class Main(FloatLayout):
 		self.add_widget(self.T)
 		self.add_widget(self.Im)
 
+		self.get_start_angle()
+		self.set_up_upload()
+
 		self.clock = None
 		self.clock2 = Clock.schedule_interval(self.update_visuals, 0.5)
-
+	def get_start_angle(self):
+		self.s = socket.socket()
+		port = 42690
+		self.s.connect(("192.168.18.19", port))
+		self.angle = self.s.recv(1024).decode("utf-8")
+		temp = int(float(self.angle)*10)
+		count = 0
+		if temp > 1800:
+			temp = 1800 - (temp - 1800)
+			for i in range(0, temp, 1):
+				self.rotate_L("Nothing")
+				count += 1
+		else:
+			for i in range(0, temp, 1):
+				self.rotate_R("Nothing")
+				count += 1
+		print(int(float(self.angle)*10), temp, count)
+		self.s.close()
+		pass
+	def set_up_upload(self):
+		port1 = 50000
+		self.s2 = socket.socket()
+		self.s2.bind(("192.168.18.19", port1))
+		self.s2.listen(5)
+		self.c, addr = self.s2.accept()
 	def press(self, butt="finally this is useful"):
 		if butt != "finally this is useful":
 			if butt.text == "W lewo":
@@ -49,6 +83,8 @@ class Main(FloatLayout):
 	def release(self, butt="but not here..."):
 		if butt != "but not here...":
 			Clock.unschedule(self.clock)
+			mess = str(self.T.text)
+			self.c.send(mess.encode("utf-8"))
 		pass
 	def rotate_L(self, really):
 		if float(self.T.text) == 0.0:
@@ -79,6 +115,7 @@ class Main(FloatLayout):
 		self.L.pos = (((1/3*x) - (0.5*0.2*x)), ((0.7*y) - (0.1*y*0.5)))
 		self.R.pos = (((2/3*x) - (0.5*0.2*x)), ((0.7*y) - (0.1*y*0.5)))
 		self.T.pos = (((0.5*x) - (0.5*0.2*x)), ((0.4*y) - (0.1*y*0.5)))
+		self.Im.pos = (0.0025*x, 0)
 
 class MyApp(App):
 	@staticmethod
