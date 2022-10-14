@@ -7,7 +7,7 @@ port = 42690
 port1 = 50000
 s.bind(("192.168.18.19", port))
 print("socket bound to %s" %(port))
-angle = 359.0
+angle = 90.0
 print("angle var is created")
 s.listen(5)
 print("socket is listening")

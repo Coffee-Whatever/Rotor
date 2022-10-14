@@ -1,6 +1,7 @@
 import kivy
 import sys
 import socket
+from screeninfo import get_monitors
 
 from kivy.app import App
 from kivy.clock import Clock
@@ -15,10 +16,10 @@ from kivy.graphics.context_instructions import PushMatrix, PopMatrix, Rotate
 
 kivy.require('2.1.0')
 
-x, y = Window.size
-if x < y:
-	x, y = 800, 800
-	Window.size = (x, y)
+x, y = Window.size # pobranie wymiarów, aby wyświetlić elementy relatywnie
+if x > y: # ustawia wymiary okna na maksymalne-250 w obu wymiarach dla monitorów szerszych niż wyższych
+	x, y = get_monitors()[0].width, get_monitors()[0].height
+	Window.size = (x-250, y-250)
 
 Window.top = 35
 Window.left = 5
@@ -42,8 +43,8 @@ class Main(FloatLayout):
 		self.angle = 0
 		global x
 		global y
-		self.L = Button(text="W lewo", size_hint=(0.2, 0.1))
-		self.R = Button(text="W prawo", size_hint=(0.2, 0.1))
+		self.L = Button(text="Lewo", size_hint=(0.2, 0.1))
+		self.R = Button(text="Prawo", size_hint=(0.2, 0.1))
 		self.T = Label(text="0.0", size_hint=(0.2, 0.1))
 		self.Obr = Obraz()
 
@@ -78,7 +79,6 @@ class Main(FloatLayout):
 			for i in range(0, temp, 1):
 				self.rotate_R("Nothing")
 				count += 1
-		print(int(float(self.angle)*10), temp, count)
 		self.s.close()
 		pass
 	def set_up_upload(self):
@@ -89,7 +89,7 @@ class Main(FloatLayout):
 		self.c, addr = self.s2.accept()
 	def press(self, butt="finally this is useful"):
 		if butt != "finally this is useful":
-			if butt.text == "W lewo":
+			if butt.text == "Lewo":
 				self.clock = Clock.schedule_interval(self.rotate_L, 0.01)
 			else:
 				self.clock = Clock.schedule_interval(self.rotate_R, 0.01)
@@ -130,10 +130,10 @@ class Main(FloatLayout):
 		self.R.pos = (((2/3*x) - (0.5*0.2*x)), ((0.7*y) - (0.1*y*0.5)))
 		self.T.pos = (((0.5*x) - (0.5*0.2*x)), ((0.4*y) - (0.1*y*0.5)))
 
-class MyApp(App):
+class RotorApp(App):
 	@staticmethod
 	def build():
 		return Main()
 
 if __name__ == '__main__':
-	MyApp().run()
+	RotorApp().run()
