@@ -18,8 +18,8 @@ kivy.require('2.1.0')
 
 x, y = Window.size # pobranie wymiarów, aby wyświetlić elementy relatywnie
 if x > y: # ustawia wymiary okna na maksymalne-250 w obu wymiarach dla monitorów szerszych niż wyższych
-	x, y = get_monitors()[0].width, get_monitors()[0].height
-	Window.size = (x-250, y-250)
+	x, y = get_monitors()[0].width-250, get_monitors()[0].height-250
+	Window.size = (x, y)
 
 Window.top = 35
 Window.left = 5
