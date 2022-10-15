@@ -1,2 +1,4 @@
 # Rotor
-Potrzeba tylko Kivy jak narazie
+Potrzebne biblioteki:
+- screeninfo
+- kivy
